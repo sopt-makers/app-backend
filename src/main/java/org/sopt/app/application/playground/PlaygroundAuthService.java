@@ -184,6 +184,10 @@ public class PlaygroundAuthService {
         return playgroundWebPageUrl + "/?feed=" + postId;
     }
 
+    private String convertCoffeeChatWebPageUrl(Long memberId) {
+        return playgroundWebPageUrl + "/coffeechat/" + memberId;
+    }
+
     public boolean isCurrentGeneration(Long generation) {
         return generation.equals(currentGeneration);
     }
@@ -191,12 +195,18 @@ public class PlaygroundAuthService {
     public List<RecentPostsResponse> getRecentPosts(String playgroundToken) {
         final Map<String, String> accessToken = createAuthorizationHeaderByUserPlaygroundToken(playgroundToken);
         try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
-            List<PlayGroundPostCategory> categories = List.of(PlayGroundPostCategory.SOPT_ACTIVITY, PlayGroundPostCategory.FREE, PlayGroundPostCategory.PART);
-            CompletableFuture<RecentPostsResponse> hotPostFuture = CompletableFuture.supplyAsync(() ->
-                    RecentPostsResponse.of(playgroundClient.getPlaygroundHotPost(accessToken)), executor);
+            List<PlayGroundPostCategory> categories = List.of(PlayGroundPostCategory.SOPT_ACTIVITY,
+                    PlayGroundPostCategory.FREE, PlayGroundPostCategory.PART);
+            CompletableFuture<RecentPostsResponse> hotPostFuture = CompletableFuture.supplyAsync(
+                            () -> playgroundClient.getPlaygroundHotPost(accessToken), executor)
+                    .thenApply(post -> RecentPostsResponse.of(post, convertPlaygroundWebPageUrl(post.postId())));
             List<CompletableFuture<RecentPostsResponse>> categoryFutures = categories.stream()
-                    .map(category -> CompletableFuture.supplyAsync(() -> playgroundClient.getRecentPosts(accessToken, category.getDisplayName()), executor))
-                    .toList();
+                    .map(category -> CompletableFuture.supplyAsync(
+                                    () -> playgroundClient.getRecentPosts(accessToken, category.getDisplayName()), executor)
+                            .thenApply(post -> {
+                                post.setLink(convertPlaygroundWebPageUrl(post.getId()));
+                                return post;
+                            })).toList();
             List<CompletableFuture<RecentPostsResponse>> allFutures = new ArrayList<>(categoryFutures);
             allFutures.addFirst(hotPostFuture);
             CompletableFuture<Void> allOf = CompletableFuture.allOf(allFutures.toArray(new CompletableFuture[0]));
@@ -214,21 +224,19 @@ public class PlaygroundAuthService {
 
     public List<EmploymentPostResponse> getPlaygroundEmploymentPost(String accessToken) {
         Map<String, String> requestHeader = createAuthorizationHeaderByUserPlaygroundToken(accessToken);
-        PlayGroundEmploymentResponse postInfo = playgroundClient.getPlaygroundEmploymentPost(requestHeader,16,10,0);
+        PlayGroundEmploymentResponse postInfo = playgroundClient.getPlaygroundEmploymentPost(requestHeader, 16, 10, 0);
         return postInfo.posts().stream()
-                .map(EmploymentPostResponse::of)
+                .map(post -> EmploymentPostResponse.of(post, convertPlaygroundWebPageUrl(post.id())))
                 .toList();
     }
 
     public List<CoffeeChatResponse> getCoffeeChatList(String accessToken) {
-        Map<String, String> headers = PlaygroundHeaderCreator.createAuthorizationHeaderByUserPlaygroundToken(accessToken);
+        Map<String, String> headers = PlaygroundHeaderCreator.createAuthorizationHeaderByUserPlaygroundToken(
+                accessToken);
         return playgroundClient.getCoffeeChatList(headers).coffeeChatList().stream()
                 .filter(member -> !member.isBlind())
-                .map(i -> CoffeeChatResponse.of(i, getCurrentActivity(i)))
-                .toList();
+                .map(member -> CoffeeChatResponse.of(member, getCurrentActivity(member), convertCoffeeChatWebPageUrl(member.memberId()))).toList();
     }
-
-
 
     public List<EmploymentPostResponse> getPlaygroundEmploymentPostWithMemberInfo(String playgroundToken) {
         List<EmploymentPostResponse> employmentPosts = getPlaygroundEmploymentPost(playgroundToken);
@@ -239,7 +247,8 @@ public class PlaygroundAuthService {
         if (postDetail.member() != null) {
             return (T) post.withMemberDetail(postDetail.member().name(), postDetail.member().profileImage());
         } else if (postDetail.anonymousProfile() != null) {
-            return (T) post.withMemberDetail(postDetail.anonymousProfile().nickname(), postDetail.anonymousProfile().profileImgUrl());
+            return (T) post.withMemberDetail(postDetail.anonymousProfile().nickname(),
+                    postDetail.anonymousProfile().profileImgUrl());
         }
         throw new EntityNotFoundException("Member not found");
     }
@@ -261,9 +270,11 @@ public class PlaygroundAuthService {
                 .findFirst()
                 .orElse(null);
     }
+
     public int getUserSoptLevel(User user) {
-        final Map<String, String> accessToken = createAuthorizationHeaderByUserPlaygroundToken(user.getPlaygroundToken());
-        return playgroundClient.getPlayGroundUserSoptLevel(accessToken,user.getPlaygroundId()).soptProjectCount();
+        final Map<String, String> accessToken = createAuthorizationHeaderByUserPlaygroundToken(
+                user.getPlaygroundToken());
+        return playgroundClient.getPlayGroundUserSoptLevel(accessToken, user.getPlaygroundId()).soptProjectCount();
     }
 
     public PlaygroundProfile getPlayGroundProfile(String accessToken) {

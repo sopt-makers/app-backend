@@ -19,12 +19,14 @@ public class EmploymentPostResponse implements PostWithMemberInfo {
     private String name;
     private String title;
     private String content;
+    private String link;
     private List<String> images;
 
-    public static EmploymentPostResponse of(EmploymentPost employmentPost) {
+    public static EmploymentPostResponse of(EmploymentPost employmentPost, String link) {
         return EmploymentPostResponse.builder()
                 .id(employmentPost.id())
                 .categoryName(employmentPost.categoryName())
+                .link(link)
                 .title(employmentPost.title())
                 .content(employmentPost.content())
                 .images(employmentPost.images())
@@ -40,6 +42,7 @@ public class EmploymentPostResponse implements PostWithMemberInfo {
                 .title(this.title)
                 .content(this.content)
                 .images(this.images)
+                .link(this.link)
                 .build();
     }
 }

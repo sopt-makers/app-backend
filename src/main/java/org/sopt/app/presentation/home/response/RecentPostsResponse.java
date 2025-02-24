@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.sopt.app.application.playground.dto.PlaygroundPostInfo.PlaygroundPostResponse;
 import org.sopt.app.application.playground.dto.PostWithMemberInfo;
 
@@ -18,14 +19,17 @@ public class RecentPostsResponse implements PostWithMemberInfo {
     private String name;
     private String category;
     private String content;
+    @Setter
+    private String link;
     private Boolean isHotPost;
     
     
-    public static RecentPostsResponse of(PlaygroundPostResponse playgroundPostResponse) {
+    public static RecentPostsResponse of(PlaygroundPostResponse playgroundPostResponse,String link) {
         return RecentPostsResponse.builder()
                 .id(playgroundPostResponse.postId())
                 .title(playgroundPostResponse.title())
                 .category("HOT")
+                .link(link)
                 .content(playgroundPostResponse.content())
                 .isHotPost(true)
                 .build();
@@ -37,6 +41,7 @@ public class RecentPostsResponse implements PostWithMemberInfo {
                 .title(this.title)
                 .profileImage(profileImage)
                 .name(name)
+                .link(this.link)
                 .category(this.category)
                 .content(this.content)
                 .isHotPost(this.isHotPost)

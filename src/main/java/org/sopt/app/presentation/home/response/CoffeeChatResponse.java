@@ -13,6 +13,7 @@ public class CoffeeChatResponse {
     private String bio;
     private List<String> topicTypeList;
     private String profileImage;
+    private String link;
     private String name;
     private String career;
     private String organization;
@@ -20,7 +21,7 @@ public class CoffeeChatResponse {
     private List<String> soptActivities;
     private String currentSoptActivity;
 
-    public static CoffeeChatResponse of(PlayGroundCoffeeChatResponse playGroundCoffeeChatResponse, String currentSoptActivity) {
+    public static CoffeeChatResponse of(PlayGroundCoffeeChatResponse playGroundCoffeeChatResponse, String currentSoptActivity,String link) {
         List<String> updatedSoptActivities = new ArrayList<>(playGroundCoffeeChatResponse.soptActivities());
         if (currentSoptActivity != null) {
             updatedSoptActivities.remove(currentSoptActivity);
@@ -31,6 +32,7 @@ public class CoffeeChatResponse {
                 .topicTypeList(playGroundCoffeeChatResponse.topicTypeList())
                 .profileImage(playGroundCoffeeChatResponse.profileImage())
                 .name(playGroundCoffeeChatResponse.name())
+                .link(link)
                 .career(playGroundCoffeeChatResponse.career().equals("아직 없어요") ? null : playGroundCoffeeChatResponse.career())
                 .organization(playGroundCoffeeChatResponse.organization())
                 .companyJob(playGroundCoffeeChatResponse.companyJob())
