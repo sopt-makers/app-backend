@@ -57,8 +57,8 @@ public class SoptampUserFixture {
             .nickname(SOPTAMP_USER_6.getNickname())
             .totalPoints(SOPTAMP_USER_6.getTotalPoints()).build();
     public static final List<SoptampUserInfo> SOPTAMP_USER_INFO_LIST =
-            List.of(SOPTAMP_USER_INFO_1, SOPTAMP_USER_INFO_2, SOPTAMP_USER_INFO_3,
-                    SOPTAMP_USER_INFO_4, SOPTAMP_USER_INFO_5, SOPTAMP_USER_INFO_6);
+            List.of(SOPTAMP_USER_INFO_6, SOPTAMP_USER_INFO_5, SOPTAMP_USER_INFO_4,
+                    SOPTAMP_USER_INFO_3, SOPTAMP_USER_INFO_2, SOPTAMP_USER_INFO_1);
     public static final List<SoptampUserInfo> SERVER_PART_SOPTAMP_USER_INFO_LIST =
             List.of(SOPTAMP_USER_INFO_6, SOPTAMP_USER_INFO_5, SOPTAMP_USER_INFO_1);
 }

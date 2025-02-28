@@ -29,7 +29,7 @@ class RankFacadeTest {
     @DisplayName("SUCCESS_현재 기수의 솝탬프 유저 랭킹 조회")
     void SUCCESS_findCurrentRanks() {
         //given
-        given(soptampUserFinder.findAllOfCurrentGeneration()).willReturn(SOPTAMP_USER_INFO_LIST);
+        given(soptampUserFinder.findAllOfCurrentGenerationOrderByTotalPoints()).willReturn(SOPTAMP_USER_INFO_LIST);
 
         // when
         List<Main> result = rankFacade.findCurrentRanks();
@@ -41,11 +41,11 @@ class RankFacadeTest {
                         .nickname(SOPTAMP_USER_5.getNickname())
                         .point(SOPTAMP_USER_5.getTotalPoints()).build(),
                 Main.builder().rank(5)
-                        .nickname(SOPTAMP_USER_3.getNickname())
-                        .point(SOPTAMP_USER_3.getTotalPoints()).build(),
-                Main.builder().rank(5)
                         .nickname(SOPTAMP_USER_4.getNickname())
                         .point(SOPTAMP_USER_4.getTotalPoints()).build(),
+                Main.builder().rank(5)
+                        .nickname(SOPTAMP_USER_3.getNickname())
+                        .point(SOPTAMP_USER_3.getTotalPoints()).build(),
                 Main.builder().rank(4)
                         .nickname(SOPTAMP_USER_2.getNickname())
                         .point(SOPTAMP_USER_2.getTotalPoints()).build(),
@@ -65,7 +65,7 @@ class RankFacadeTest {
     @DisplayName("SUCCESS 파트별 현재 기수의 솝탬프 유저 랭킹 조회")
     void findCurrentRanksByPart() {
         // given
-        given(soptampUserFinder.findAllByPartAndCurrentGeneration(Part.SERVER)).willReturn(SERVER_PART_SOPTAMP_USER_INFO_LIST);
+        given(soptampUserFinder.findAllByPartAndCurrentGenerationOrderByTotalPoints(Part.SERVER)).willReturn(SERVER_PART_SOPTAMP_USER_INFO_LIST);
         // when
         List<Main> result = rankFacade.findCurrentRanksByPart(Part.SERVER);
         List<Main> expected = List.of(
