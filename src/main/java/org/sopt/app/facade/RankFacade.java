@@ -1,9 +1,9 @@
 package org.sopt.app.facade;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import lombok.RequiredArgsConstructor;
 import org.sopt.app.application.rank.SoptampPartRankCalculator;
-import org.sopt.app.application.rank.SoptampUserRankCalculator;
 import org.sopt.app.application.soptamp.SoptampPointInfo.Main;
 import org.sopt.app.application.soptamp.SoptampPointInfo.PartRank;
 import org.sopt.app.application.soptamp.SoptampUserFinder;
@@ -20,16 +20,18 @@ public class RankFacade {
 
     @Transactional(readOnly = true)
     public List<Main> findCurrentRanks() {
-        List<SoptampUserInfo> soptampUserInfos = soptampUserFinder.findAllOfCurrentGeneration();
-        SoptampUserRankCalculator soptampUserRankCalculator = new SoptampUserRankCalculator(soptampUserInfos);
-        return soptampUserRankCalculator.calculateRank();
+        AtomicInteger rankPoint = new AtomicInteger(1);
+        return soptampUserFinder.findAllOfCurrentGenerationOrderByTotalPoints().stream()
+                .map(user -> Main.of(rankPoint.getAndIncrement(), user))
+                .toList();
     }
 
     @Transactional(readOnly = true)
     public List<Main> findCurrentRanksByPart(Part part) {
-        List<SoptampUserInfo> soptampUserInfos = soptampUserFinder.findAllByPartAndCurrentGeneration(part);
-        SoptampUserRankCalculator soptampUserRankCalculator = new SoptampUserRankCalculator(soptampUserInfos);
-        return soptampUserRankCalculator.calculateRank();
+        AtomicInteger rankPoint = new AtomicInteger(1);
+        return soptampUserFinder.findAllByPartAndCurrentGenerationOrderByTotalPoints(part).stream()
+                .map(user -> Main.of(rankPoint.getAndIncrement(), user))
+                .toList();
     }
 
     @Transactional(readOnly = true)

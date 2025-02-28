@@ -26,8 +26,15 @@ public class SoptampUserFinder {
                 .toList();
     }
 
-    public List<SoptampUserInfo> findAllByPartAndCurrentGeneration(Part part) {
-        return soptampUserRepository.findAllByNicknameStartingWithAndGeneration(part.getPartName(), currentGeneration)
+    public List<SoptampUserInfo> findAllOfCurrentGenerationOrderByTotalPoints() {
+        return soptampUserRepository.findAllByGenerationOrderByTotalPointsDesc(currentGeneration)
+                .stream()
+                .map(SoptampUserInfo::of)
+                .toList();
+    }
+
+    public List<SoptampUserInfo> findAllByPartAndCurrentGenerationOrderByTotalPoints(Part part) {
+        return soptampUserRepository.findAllByNicknameStartingWithAndGenerationOrderByTotalPointsDesc(part.getPartName(), currentGeneration)
                 .stream()
                 .map(SoptampUserInfo::of)
                 .toList();
