@@ -10,6 +10,7 @@ import org.sopt.app.domain.enums.PlaygroundPart;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(indexes = @Index(name = "idx_generation_total_points", columnList = "generation, total_points"))
 public class SoptampUser extends BaseEntity {
 
     @Id
